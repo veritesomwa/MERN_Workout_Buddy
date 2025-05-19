@@ -21,18 +21,19 @@ const addWorkout = async (req, res) => {
       .status(400)
       .json({ error: "Please fill in all the fields", emptyFields })
   }
-
-  Workout.create(req.body)
-    .then((workout) => {
-      res.status(200).json(workout)
-    })
-    .catch((err) => {
-      res.status(400).json({ error: err.message })
-    })
+  try {
+    const user_id = req.user._id
+    console.log(user_id)
+    const workout = await Workout.create({ name, load, reps, user_id })
+    res.status(200).json(workout)
+  } catch (error) {
+    res.status(400).json({ error: error.message })
+  }
 }
 // Get all workouts
 const getWorkouts = async (req, res) => {
-  Workout.find({})
+  const user_id = req.user._id
+  Workout.find({ user_id })
     .sort({ createdAt: -1 })
     .then((results) => {
       res.status(200).json(results)
